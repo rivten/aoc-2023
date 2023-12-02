@@ -5,7 +5,13 @@ import java.util.Map;
 import java.util.HashMap;
 
 class Day02 {
-    private record Game(int id, Map<String, Integer> seen) {}
+    private record Game(int id, Map<String, Integer> seen) {
+        private int power() {
+            return seen().getOrDefault("red", 0)
+                * seen().getOrDefault("green", 0)
+                * seen().getOrDefault("blue", 0);
+        }
+    }
 
     private static boolean isGameOk(Game g) {
         return g.seen().getOrDefault("red", 0) <= 12
@@ -32,10 +38,14 @@ class Day02 {
     }
     public static void main(String[] args) {
         var bi = new BufferedReader(new InputStreamReader(System.in));
+        //int sol = bi.lines()
+        //    .map(Day02::parse)
+        //    .filter(Day02::isGameOk)
+        //    .mapToInt(Game::id)
+        //    .sum();
         int sol = bi.lines()
             .map(Day02::parse)
-            .filter(Day02::isGameOk)
-            .mapToInt(Game::id)
+            .mapToInt(Game::power)
             .sum();
 
         System.out.println(sol);
