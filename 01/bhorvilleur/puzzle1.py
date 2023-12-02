@@ -1,6 +1,6 @@
 def puzzle1():
     res = 0
-    with open("data_puzzle.txt", "r") as f:
+    with open("input_01.txt", "r") as f:
         for ln in f:
             _, first_digit, _, last_digit = read_digits_puzzle(ln)
             res = res + 10 * first_digit + last_digit
@@ -11,7 +11,7 @@ def puzzle2():
     res = 0
     script_numbers = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
                       "nine": 9}
-    with open("data_puzzle.txt", "r") as f:
+    with open("input_01.txt", "r") as f:
         for ln in f:
             pos_first_digit, first_digit, pos_last_digit, last_digit = read_digits_puzzle(ln)
 
