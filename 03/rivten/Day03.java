@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 class Day03 {
 
@@ -27,13 +28,43 @@ class Day03 {
     }
 
     private interface EngineContent {}
-    private record Symbol(char c) implements EngineContent {}
+
+    private record Symbol(char c) implements EngineContent {
+        private int gearValue(P p, Map<P, EngineContent> engine) {
+            var prox = new ArrayList<Number>();
+            for (var entry: engine.entrySet()) {
+                if (entry.getValue() instanceof Number) {
+                    var n = (Number)entry.getValue();
+                    if (n.isPointInContact(entry.getKey(), p)) {
+                        prox.add(n);
+                    }
+                }
+            }
+            if (prox.size() == 2) {
+                return prox.get(0).value * prox.get(1).value;
+            } else {
+                return 0;
+            }
+        }
+    }
+
     private record Number(int value, int len) implements EngineContent {
         private boolean isPart(P p, Map<P, EngineContent> engine) {
             for (int charIndex = 0; charIndex < len; ++charIndex) {
                 for (var testP : new P(p.line, p.col + charIndex).around()) {
                     var maybeContent = engine.get(testP);
                     if (maybeContent != null && maybeContent instanceof Symbol) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private boolean isPointInContact(P p, P otherP) {
+            for (int charIndex = 0; charIndex < len; ++charIndex) {
+                for (var testP : new P(p.line, p.col + charIndex).around()) {
+                    if (testP.line == otherP.line && testP.col == otherP.col) {
                         return true;
                     }
                 }
@@ -89,13 +120,20 @@ class Day03 {
         var engine = parse();
         int sum = 0;
         for (var entry: engine.entrySet()) {
-            if (entry.getValue() instanceof Number) {
-                var n = (Number)entry.getValue();
-                if (n.isPart(entry.getKey(), engine)) {
-                    sum += n.value();
-                } else {
-                    System.out.println(entry);
-                }
+            // PART 1
+            //if (entry.getValue() instanceof Number) {
+            //    var n = (Number)entry.getValue();
+            //    if (n.isPart(entry.getKey(), engine)) {
+            //        sum += n.value();
+            //    } else {
+            //        System.out.println(entry);
+            //    }
+            //}
+
+            // PART 2
+            if (entry.getValue() instanceof Symbol && ((Symbol)entry.getValue()).c == '*') {
+                var gearValue = ((Symbol)entry.getValue()).gearValue(entry.getKey(), engine);
+                sum += gearValue;
             }
         }
         System.out.println(sum);
