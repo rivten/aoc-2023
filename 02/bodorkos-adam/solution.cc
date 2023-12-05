@@ -30,6 +30,18 @@ public:
         return num_;
     };
 
+    bool is_possible() const
+    {
+        static const std::map<std::string_view, int> max_cubes_by_color =
+        {
+            {"red"sv, 12},
+            {"green"sv, 13},
+            {"blue"sv, 14},
+        };
+
+        return (num() <= max_cubes_by_color.find(color())->second);
+    }
+
 private:
     std::string color_;
     int num_;
@@ -50,22 +62,20 @@ public:
 
     bool is_possible() const
     {
-        static const std::map<std::string_view, int> max_cubes_by_color =
-        {
-            {"red"sv, 12},
-            {"green"sv, 13},
-            {"blue"sv, 14},
-        };
-
         for (Draw const& draw : draws_)
         {
-            if (draw.num() > max_cubes_by_color.find(draw.color())->second)
+            if (!draw.is_possible())
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    std::vector<Draw> const& draws() const
+    {
+        return draws_;
     }
 
 private:
@@ -107,6 +117,38 @@ public:
         return true;
     }
 
+    int power() const
+    {
+        std::map<std::string_view, int> max_cubes_by_color;
+
+        for (Reveal const& reveal : reveals_)
+        {
+            for (Draw const& draw: reveal.draws())
+            {
+                const auto it = max_cubes_by_color.find(draw.color());
+
+                if (it != max_cubes_by_color.end())
+                {
+                    if (draw.num() > it->second)
+                    {
+                        it->second = draw.num();
+                    }
+                }
+                else
+                {
+                    max_cubes_by_color.emplace(draw.color(), draw.num());
+                }
+            }
+        }
+
+        return std::accumulate(max_cubes_by_color.begin(), max_cubes_by_color.end(), 1,
+            [](const int product, const std::map<std::string_view, int>::value_type entry)
+            {
+                return (product * entry.second);
+            }
+        );
+    }
+
 private:
     int id_;
     std::vector<Reveal> reveals_;
@@ -128,7 +170,14 @@ void solve_puzzle_1(std::vector<std::string> const& lines)
 
 void solve_puzzle_2(std::vector<std::string> const& lines)
 {
-    const int sum {0};
+    const int sum = std::accumulate(lines.begin(), lines.end(), 0,
+        [](const int sum, std::string const& line)
+        {
+            const Game game {line};
+
+            return sum + (game.power());
+        }
+    );
 
     std::cout << sum << std::endl;
 }
