@@ -5,8 +5,8 @@ green = "green"
 blue = "blue"
 
 
-def puzzle1(maxRed, maxGreen, maxBlue):
-    limits = {red: maxRed, green: maxGreen, blue: maxBlue}
+def puzzle1(max_red, max_green, max_blue):
+    limits = {red: max_red, green: max_green, blue: max_blue}
 
     def compute(id, drawings):
         is_ok = all(all((value <= limits[color]) for (color, value) in drawing.items()) for drawing in drawings)
