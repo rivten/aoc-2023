@@ -37,7 +37,7 @@ void solve_puzzle_2(std::vector<std::string> const& lines)
             int digit_2 {0};
 
             const auto set_digit =
-                [&digit_1, &digit_2](int value)
+                [&digit_1, &digit_2](const int value)
                 {
                     ((digit_1 == 0) ? digit_1 : digit_2) = value;
                 };
