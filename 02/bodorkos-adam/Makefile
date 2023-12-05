@@ -2,7 +2,7 @@ ifndef VERBOSE
 .SILENT:
 endif
 
-CC = g++ -std=c++2a
+CC = g++ -std=c++2a -O2
 
 default: run
 build: main.o solution.o
