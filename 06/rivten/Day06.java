@@ -25,17 +25,14 @@ class Day06 {
             // then we have two solutions
             // s0 = (- b - sqrt(delta)) / (2 * a)
             // s1 = (- b + sqrt(delta)) / (2 * a)
-            // since we look for the range, we have:
-            // s1 - s0 = sqrt(delta) / a
 
-            var epsilon = 0.001; // epsilon is a hack because we need to be _strictly_ better than t
             var delta = t * t - 4 * d;
             var sqrtDelta = Math.sqrt(delta);
             var s0 = (t - sqrtDelta) / 2.0;
             var s1 = (t + sqrtDelta) / 2.0;
-            var start = (long)Math.ceil(Math.max(Math.min(epsilon + s0, t), 0.0));
-            var end = (long)Math.floor(Math.max(Math.min(-epsilon + s1, t), 0.0));
-            return end + 1 - start;
+            var startExcl = (long)Math.floor(s0);
+            var endExcl = (long)Math.ceil(s1);
+            return endExcl - startExcl - 1;
         }
     }
 
@@ -63,7 +60,7 @@ class Day06 {
     public static void main(String[] args) {
         //var races = parse();
         //var sol = Arrays.stream(races)
-        //    .mapToInt(Race::solveCount)
+        //    .mapToLong(Race::solveCount)
         //    .reduce(1, (a, b) -> a * b);
         var race = parseRace();
         var sol = race.solveCount();
