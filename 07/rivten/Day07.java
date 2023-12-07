@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 class Day07 {
 
     private enum Card {
+        Jack,
         Two,
         Three,
         Four,
@@ -21,7 +22,6 @@ class Day07 {
         Eight,
         Nine,
         Ten,
-        Jack,
         Queen,
         King,
         Ace,
@@ -30,8 +30,8 @@ class Day07 {
     static class HandComparator implements Comparator<List<Card>> {
         @Override
         public int compare(List<Card> a, List<Card> b) {
-            var ra = rankHand(a);
-            var rb = rankHand(b);
+            var ra = rankHandWithJoker(a);
+            var rb = rankHandWithJoker(b);
             if (ra == rb) {
                 for (int i = 0; i < a.size(); ++i) {
                     if (a.get(i) != b.get(i)) {
@@ -52,6 +52,53 @@ class Day07 {
             FullHouse,
             FourOfAKind,
             FiveOfAKind,
+        }
+
+        private static HandType rankHandWithJoker(List<Card> hand) {
+            var jokerPositions = new HashSet<Integer>();
+            for (int i = 0; i < hand.size(); ++i) {
+                if (hand.get(i) == Card.Jack) {
+                    jokerPositions.add(i);
+                }
+            }
+            if (jokerPositions.size() == 5 || jokerPositions.size() == 4) {
+                return HandType.FiveOfAKind;
+            }
+            if (jokerPositions.size() == 0) {
+                return rankHand(hand);
+            }
+
+            var permutations = new ArrayList<ArrayList<Card>>();
+            permutations.add(new ArrayList<Card>());
+            for (var jokerPosition: jokerPositions) {
+                var nextPermutations = new ArrayList<ArrayList<Card>>();
+                for (var permutation: permutations) {
+                    for (var card: Card.values()) {
+                        var permCopy = new ArrayList<Card>(permutation);
+                        permCopy.add(card);
+                        nextPermutations.add(permCopy);
+                    }
+                }
+                permutations = nextPermutations;
+            }
+
+            HandType bestRank = HandType.HighCard;
+
+            for (var permutation: permutations) {
+                var mutHand = new ArrayList<Card>(hand);
+                int permCardIndex = 0;
+                for (int i = 0; i < hand.size(); ++i) {
+                    if (mutHand.get(i) == Card.Jack) {
+                        mutHand.set(i, permutation.get(permCardIndex));
+                        permCardIndex++;
+                    }
+                }
+                final var rank = rankHand(mutHand);
+                if (rank.compareTo(bestRank) > 0) {
+                    bestRank = rank;
+                }
+            }
+            return bestRank;
         }
 
         private static HandType rankHand(List<Card> hand) {
