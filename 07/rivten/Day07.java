@@ -55,22 +55,18 @@ class Day07 {
         }
 
         private static HandType rankHandWithJoker(List<Card> hand) {
-            var jokerPositions = new HashSet<Integer>();
-            for (int i = 0; i < hand.size(); ++i) {
-                if (hand.get(i) == Card.Jack) {
-                    jokerPositions.add(i);
-                }
-            }
-            if (jokerPositions.size() == 5 || jokerPositions.size() == 4) {
+            long jokerCount = hand.stream().filter(c -> c == Card.Jack).count();
+
+            if (jokerCount == 5 || jokerCount == 4) {
                 return HandType.FiveOfAKind;
             }
-            if (jokerPositions.size() == 0) {
+            if (jokerCount == 0) {
                 return rankHand(hand);
             }
 
             var permutations = new ArrayList<ArrayList<Card>>();
             permutations.add(new ArrayList<Card>());
-            for (var jokerPosition: jokerPositions) {
+            for (int i = 0; i < jokerCount; ++i) {
                 var nextPermutations = new ArrayList<ArrayList<Card>>();
                 for (var permutation: permutations) {
                     for (var card: Card.values()) {
