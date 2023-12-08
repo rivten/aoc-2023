@@ -41,11 +41,7 @@ class Day08 {
         }
     }
 
-    private final record FloydResult(long mu, long lambda) {
-        boolean isZ(long index) {
-            return (((index - mu) % lambda) + mu) == lambda - 1;
-        }
-    }
+    private final record FloydResult(long mu, long lambda) {}
 
     static long gcd(long a, long b) {
         if (a == 0 || b == 0) return a + b;
