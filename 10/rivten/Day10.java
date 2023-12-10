@@ -9,13 +9,27 @@ class Day10 {
         var adjA = graph.getOrDefault(a, new HashSet<P>());
         adjA.add(b);
         graph.put(a, adjA);
-
-        //var adjB = graph.getOrDefault(b, new HashSet<P>());
-        //adjB.add(a);
-        //graph.put(b, adjB);
     }
 
     private record Step(P p, int d) {}
+
+    private static boolean isVert(List<String> lines, P p) {
+        char c = lines.get(p.y).charAt(p.x);
+        // we could, or maybe not, add S, depending on whether it represent a L or J or | in the given example.
+        // this needs to be added or removed on a case-by-case basis based on the example.
+        return c == '|' || c == 'L' ||  c == 'J' || c == 'S';
+    }
+
+    private static boolean isPointInGraph(List<String> lines, P p, Set<P> loop) {
+        int crossed = 0;
+        for (int x = p.x; x >= 0; --x) {
+            var newP = new P(x, p.y);
+            if (loop.contains(newP) && isVert(lines, newP)) {
+                crossed++;
+            }
+        }
+        return crossed % 2 == 1;
+    }
 
     public static void main(String[] args) {
         var br = new BufferedReader(new InputStreamReader(System.in));
@@ -141,6 +155,35 @@ class Day10 {
                 }
             }
         }
-        System.out.println(maxDist);
+
+        //for (int y = 0; y < lines.size(); ++y) {
+        //    var line = lines.get(y);
+        //    for (int x = 0; x < line.length(); ++x) {
+        //        if (seen.contains(new P(x, y))) {
+        //            System.out.print("x");
+        //        } else {
+        //            if (isPointInGraph(lines, new P(x, y), seen)) {
+        //                System.out.print("I");
+        //            } else {
+        //                System.out.print("O");
+        //            }
+        //        }
+        //    }
+        //    System.out.println();
+        //}
+
+        int count = 0;
+        for (int y = 0; y < lines.size(); ++y) {
+            var line = lines.get(y);
+            for (int x = 0; x < line.length(); ++x) {
+                var p = new P(x, y);
+                if (!seen.contains(p)) {
+                    if (isPointInGraph(lines, p, seen)) {
+                        count++;
+                    }
+                }
+            }
+        }
+        System.out.println(count);
     }
 }
