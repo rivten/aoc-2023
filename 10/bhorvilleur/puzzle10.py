@@ -9,6 +9,8 @@ WEST = 0
 EAST = 1
 
 
+# x and y are current the position
+# xp and yp are the previous position
 def find_next_position(x, y, xp, yp, shape):
     if shape == HORIZONTAL:
         if yp != y:
@@ -42,7 +44,7 @@ def find_next_position(x, y, xp, yp, shape):
         y = y + 1 if yp == y else y
     return x, y
 
-
+# returns the list of the blocks (x, y) that form the loop including the start block.
 def find_loop(pipes, start_pos, start_shape):
     xs, ys = start_pos
     shape = start_shape
@@ -77,6 +79,7 @@ def puzzle1():
         if loop is not None:
             print(start_shape + " " + str(len(loop) // 2))
 
+
 # Strategy for puzzle 2 (counting the number of blocks inside the loop) :
 # We will go through all columns of the grid, and determine at each point if we are inside or outside the loop
 def puzzle2():
@@ -95,11 +98,11 @@ def puzzle2():
         coming_from = None
         for y in range(m):
             if (x, y) in loop:
-                border_crossing = False # Will be set to true if going through this block make you go from inside the
-                # loop to ouside
-                if pipes[(x, y)] == VERTICAL: # Vertical pipes never make you go from inside to outside
+                border_crossing = False  # Will be set to true if going through this block make you go from inside the
+                # loop to outside
+                if pipes[(x, y)] == VERTICAL:  # Vertical pipes never make you go from inside to outside
                     pass
-                elif pipes[(x, y)] == HORIZONTAL: # Horizontal pipes always make you go from inside to outside
+                elif pipes[(x, y)] == HORIZONTAL:  # Horizontal pipes always make you go from inside to outside
                     border_crossing = True
                 # If we see a south-west/east pipe, we assume there is going to be a north-west/east pipe below.
                 # It will count as a border crossing if and only if the two pipes come from different directions
