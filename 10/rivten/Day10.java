@@ -34,10 +34,22 @@ class Day10 {
                         // the edges will be added by the other points
 
                         //// in theory, we should only add edges if there is no points
-                        addEdge(graph, start, new P(x - 1, y));
-                        addEdge(graph, start, new P(x, y + 1));
-                        addEdge(graph, start, new P(x + 1, y));
-                        addEdge(graph, start, new P(x, y - 1));
+                        var left = line.charAt(x - 1);
+                        if (left == '-' || left == 'L' || left == 'F') {
+                            addEdge(graph, start, new P(x - 1, y));
+                        }
+                        var right = line.charAt(x + 1);
+                        if (right == '-' || right == 'J' || right == '7') {
+                            addEdge(graph, start, new P(x + 1, y));
+                        }
+                        var top = lines.get(y - 1).charAt(x);
+                        if (top == '|' || top == 'F' || top == '7') {
+                            addEdge(graph, start, new P(x, y - 1));
+                        }
+                        var down = lines.get(y + 1).charAt(x);
+                        if (down == '|' || down == 'L' || top == 'J') {
+                            addEdge(graph, start, new P(x, y + 1));
+                        }
                     } break;
                     case '-': {
                         var here = new P(x, y);
@@ -88,47 +100,47 @@ class Day10 {
                 };
             }
         }
-        var previous = start;
-        var current = graph.get(start).toArray(new P[graph.get(start).size()])[0]; // we just hope it's 0, otherwise test another number. yes, it's ugly
-        int steps = 1;
-        while (current.x != start.x || current.y != start.y) {
-            P next = null;
-            for (var p: graph.get(current)) {
-                if (!(p.x == previous.x && p.y == previous.y)) {
-                    next = p;
-                    break;
-                }
-            }
-            assert next != null;
-            previous = current;
-            current = next;
-            steps++;
-        }
-        System.out.println(steps / 2);
 
-
-        //// performing BFS
-        //var queue = new LinkedList<Step>();
-        //var seen = new HashSet<P>();
-        //int maxDist = 0;
-        //queue.add(new Step(start, 0));
-        //while (queue.peek() != null) {
-        //    //System.out.println(String.valueOf(seen.size()) + " - " + String.valueOf(queue.size()));
-        //    var step = queue.remove();
-        //    System.out.println(step);
-
-        //    if (seen.contains(step.p)) continue;
-
-        //    seen.add(step.p);
-        //    if (step.d > maxDist) {
-        //        maxDist = step.d;
-        //    }
-        //    for (var adjP: graph.get(step.p)) {
-        //        if (!seen.contains(adjP)) {
-        //            queue.add(new Step(adjP, step.d + 1));
+        //var previous = start;
+        //var current = graph.get(start).toArray(new P[graph.get(start).size()])[0]; // we just hope it's 0, otherwise test another number. yes, it's ugly
+        //int steps = 1;
+        //while (current.x != start.x || current.y != start.y) {
+        //    P next = null;
+        //    for (var p: graph.get(current)) {
+        //        if (!(p.x == previous.x && p.y == previous.y)) {
+        //            next = p;
+        //            break;
         //        }
         //    }
+        //    assert next != null;
+        //    previous = current;
+        //    current = next;
+        //    steps++;
         //}
-        //System.out.println(maxDist);
+        //System.out.println(steps / 2);
+
+
+        // performing BFS
+        var queue = new LinkedList<Step>();
+        var seen = new HashSet<P>();
+        int maxDist = 0;
+        queue.add(new Step(start, 0));
+        while (queue.peek() != null) {
+            var step = queue.remove();
+            //System.out.println(step);
+
+            if (seen.contains(step.p)) continue;
+
+            seen.add(step.p);
+            if (step.d > maxDist) {
+                maxDist = step.d;
+            }
+            for (var adjP: graph.get(step.p)) {
+                if (!seen.contains(adjP)) {
+                    queue.add(new Step(adjP, step.d + 1));
+                }
+            }
+        }
+        System.out.println(maxDist);
     }
 }
