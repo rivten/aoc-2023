@@ -39,20 +39,20 @@ class Day11 {
             }
         }
 
-        int sol = 0;
+        long sol = 0;
         for (int i = 0; i < planets.size(); ++i) {
             var a = planets.get(i);
             for (int j = i + 1; j < planets.size(); ++j) {
                 var b = planets.get(j);
-                var d = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+                long d = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
                 for (int x = Math.min(a.x, b.x) + 1; x < Math.max(a.x, b.x); ++x) {
                     if (emptyCols.contains(x)) {
-                        d++;
+                        d += 1000000 - 1;
                     }
                 }
                 for (int y = Math.min(a.y, b.y) + 1; y < Math.max(a.y, b.y); ++y) {
                     if (emptyRows.contains(y)) {
-                        d++;
+                        d += 1000000 - 1;
                     }
                 }
                 sol += d;
