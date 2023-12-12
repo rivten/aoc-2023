@@ -3,67 +3,103 @@ import java.util.stream.*;
 import java.io.*;
 
 class Day12 {
-    private static boolean match(List<Character> springs, List<Integer> groups) {
-        int currentGroupIndex = 0;
-        int currentGroupSize = 0;
-        for (char c: springs) {
-            switch (c) {
-                case '.': {
-                    if (currentGroupSize > 0) {
-                        if (currentGroupIndex >= groups.size()) {
-                            return false;
-                        }
-                        if (groups.get(currentGroupIndex) != currentGroupSize) {
-                            return false;
-                        }
-                        currentGroupSize = 0;
-                        currentGroupIndex++;
-                    }
-                } break;
-                case '#': {
-                    currentGroupSize++;
-                } break;
-                default: 
-                    assert false;
-            }
-        }
-        if (currentGroupSize > 0) {
-            if (currentGroupIndex >= groups.size()) {
-                return false;
-            }
-            if (groups.get(currentGroupIndex) != currentGroupSize) {
-                return false;
-            }
-            currentGroupSize = 0;
-            currentGroupIndex++;
-        }
-        if (currentGroupIndex != groups.size()) {
-            return false;
-        }
-        return true;
-    }
 
-    private static long arrangements(List<Character> springs, List<Integer> groups, int index) {
-        if (index == springs.size()) {
-            if (match(springs, groups)) {
+    record S(List<Character> springs, List<Integer> groups, boolean inGroup) {}
+
+    static HashMap<S, Long> memo = new HashMap<S, Long>();
+
+    private static long arrangements(List<Character> springs, List<Integer> groups, boolean inGroup) {
+        var s = new S(springs, groups, inGroup);
+        //System.out.println("TESING " + s);
+        var r = memo.get(s);
+        if (r == null) {
+            if (springs.size() == 0) {
+                if (groups.size() == 0 || (groups.size() == 1 && groups.get(0) == 0)) {
+                    memo.put(s, 1l);
+                    return 1;
+                } else {
+                    memo.put(s, 0l);
+                    return 0;
+                }
+            }
+            if (groups.size() == 0) {
+                for (char c: springs) {
+                    if (c == '#') {
+                        memo.put(s, 0l);
+                        return 0;
+                    }
+                }
+                memo.put(s, 1l);
                 return 1;
+            }
+
+            char c = springs.get(0);
+            if (c == '.') {
+                var groupsCpy = new ArrayList<Integer>(groups);
+                if (inGroup) {
+                    if (groups.get(0) == 0) {
+                        // we have finished a group
+                        groupsCpy.remove(0);
+                    } else {
+                        memo.put(s, 0l);
+                        return 0;
+                    }
+                }
+                var springsCpy = new ArrayList<Character>(springs);
+                springsCpy.remove(0);
+                var a = arrangements(springsCpy, groupsCpy, false); 
+                memo.put(s, a);
+                return a;
+            } else if (c == '#') {
+                var springsCpy = new ArrayList<Character>(springs);
+                springsCpy.remove(0);
+                var groupsCpy = new ArrayList<Integer>(groups);
+                groupsCpy.set(0, groupsCpy.get(0) - 1);
+                if (groupsCpy.get(0) < 0) {
+                    // impossible solution
+                    memo.put(s, 0l);
+                    return 0;
+                } else {
+                    var a = arrangements(springsCpy, groupsCpy, true);
+                    memo.put(s, a);
+                    return a;
+                }
+            } else if (c == '?') {
+                var springsCpy = new ArrayList<Character>(springs);
+                springsCpy.remove(0);
+                var groupsCpy = new ArrayList<Integer>(groups);
+
+                if (groupsCpy.get(0) == 0) {
+                    assert inGroup;
+                    // we need to put a dot
+                    groupsCpy.remove(0);
+                    var a = arrangements(springsCpy, groupsCpy, false); 
+                    memo.put(s, a);
+                    return a;
+                } else {
+                    if (inGroup) {
+                        // we need to put a hash
+                        groupsCpy.set(0, groupsCpy.get(0) - 1);
+                        var a = arrangements(springsCpy, groupsCpy, true); 
+                        memo.put(s, a);
+                        return a;
+                    } else {
+                        // we can either put a dot or a hash
+                        var groupsCpyDot = new ArrayList<Integer>(groups);
+                        var groupsCpyHash = new ArrayList<Integer>(groups);
+                        groupsCpyHash.set(0, groupsCpyHash.get(0) - 1);
+                        var a = arrangements(springsCpy, groupsCpyDot, false) + arrangements(springsCpy, groupsCpyHash, true);
+                        memo.put(s, a);
+                        return a;
+                    }
+                }
+
             } else {
+                assert false;
                 return 0;
             }
         } else {
-            if (springs.get(index) == '?') {
-                var copySpringsHash = new ArrayList<Character>(springs);
-                copySpringsHash.set(index, '#');
-                var arrangementsHash = arrangements(copySpringsHash, groups, index + 1);
-
-                var copySpringsDot = new ArrayList<Character>(springs);
-                copySpringsDot.set(index, '.');
-                var arrangementsDot = arrangements(copySpringsDot, groups, index + 1);
-
-                return arrangementsHash + arrangementsDot;
-            } else {
-                return arrangements(springs, groups, index + 1);
-            }
+            return r;
         }
     }
 
@@ -71,7 +107,18 @@ class Day12 {
         var s = line.split(" ");
         var springs = s[0].chars().mapToObj(e -> (char)e).collect(Collectors.toList());
         var groups = Arrays.stream(s[1].split(",")).map(e -> Integer.parseInt(e)).collect(Collectors.toList());
-        var arrangements = arrangements(springs, groups, 0);
+        var bigSprings = new ArrayList<Character>();
+        var bigGroups = new ArrayList<Integer>();
+        for (int i = 0; i < 5; ++i) {
+            bigSprings.addAll(springs);
+            if (i != 4) {
+                bigSprings.add('?');
+            }
+            bigGroups.addAll(groups);
+        }
+
+        var arrangements = arrangements(bigSprings, bigGroups, false);
+
         return arrangements;
     }
 
