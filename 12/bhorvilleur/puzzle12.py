@@ -2,6 +2,7 @@ VALID = '.'
 DEFECTIVE = '#'
 UNKNOWN = '?'
 
+
 # Find the number of combinations that match the given list o springs and defective_rows, from i_spring and i_def_row
 # positions.
 # springs : the array of springs, containing SAFE, DEFECTIVE and UNKNOWN symbols
@@ -10,7 +11,6 @@ UNKNOWN = '?'
 # i_def_row : the starting index of the array defective_rows to consider
 # cache : a dictionary of the already visited couples i_spring/i_def_row. This cache avoids a complexity explosion.
 def find_combinations(springs, defective_rows, i_spring, i_def_row, cache):
-
     # Check the cache : if the couple (i_spring, i_def_row) has already been visited, no need to go further
     if (i_spring, i_def_row) in cache:
         return cache[(i_spring, i_def_row)]
@@ -49,13 +49,13 @@ def find_combinations(springs, defective_rows, i_spring, i_def_row, cache):
 
 
 def puzzle1():
-    data = getData()
-    res = sum([find_combinations(springs, defectiveRows, 0, 0, {}) for springs, defectiveRows in data])
+    data = get_data()
+    res = sum([find_combinations(springs, defective_rows, 0, 0, {}) for springs, defective_rows in data])
     print(res)
 
 
 def duplicate(springs, defective_rows, n):
-    new_springs, new_defective_rows = [],[]
+    new_springs, new_defective_rows = [], []
     for i in range(n):
         if i > 0:
             new_springs.append(UNKNOWN)
@@ -65,23 +65,23 @@ def duplicate(springs, defective_rows, n):
 
 
 def puzzle2():
-    data = getData()
+    data = get_data()
     res = 0
-    for (springs, defectiveRows) in data:
-        new_springs, new_defectiveRows = duplicate(springs, defectiveRows, 5)
-        combinations = find_combinations(new_springs, new_defectiveRows, 0, 0, {})
+    for (springs, defective_rows) in data:
+        new_springs, new_defective_rows = duplicate(springs, defective_rows, 5)
+        combinations = find_combinations(new_springs, new_defective_rows, 0, 0, {})
         res += combinations
     print(res)
 
 
-def getData():
+def get_data():
     data = []
     with open("input_12.txt", "r") as f:
         for ln in f:
             sep = ln.index(" ")
             springs = [t for t in ln[:sep]]
-            defectiveRows = [int(t) for t in ln[sep + 1:].split(",")]
-            data.append((springs, defectiveRows))
+            defective_rows = [int(t) for t in ln[sep + 1:].split(",")]
+            data.append((springs, defective_rows))
     return data
 
 
