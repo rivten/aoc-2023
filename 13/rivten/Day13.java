@@ -4,7 +4,7 @@ import java.util.stream.*;
 
 class Day13 {
 
-    private static int findReflectionIndex(List<String> block) {
+    private static int findReflectionIndex(List<String> block, Integer diff) {
         var storage = new HashMap<String, List<Integer>>();
         Integer reflectionStart = null;
         for (int y = 0; y < block.size(); ++y) {
@@ -12,7 +12,12 @@ class Day13 {
 
             if (reflectionStart != null) {
                 if (2 * reflectionStart - 1 - y < 0) {
-                    return reflectionStart;
+                    if (diff != null && diff == reflectionStart) {
+                        // we found one, but it's already the one we got
+                        reflectionStart = null;
+                    } else {
+                        return reflectionStart;
+                    }
                 }
             }
 
@@ -38,9 +43,27 @@ class Day13 {
         return reflectionStart == null ? 0 : reflectionStart;
     }
 
+    private static int findSmudgedReflectionIndex(List<String> block, int nonSmudgedIndex) {
+        for (int i = 0; i < block.size(); ++i) {
+            var line = block.get(i);
+            for (int j = 0; j < line.length(); ++j) {
+                var cpyBlock = new ArrayList<String>(block);
+                var cpyLine = new StringBuilder(line);
+                cpyLine.setCharAt(j, line.charAt(j) == '.' ? '#' : '.');
+                cpyBlock.set(i, cpyLine.toString());
+                var newBlockIndex = findReflectionIndex(cpyBlock, nonSmudgedIndex);
+                if (newBlockIndex != 0 && newBlockIndex != nonSmudgedIndex) {
+                    return newBlockIndex;
+                }
+            }
+        }
+        return 0;
+    }
+
     private static long score(List<String> block) {
         // horizontal reflection
-        var horizIndex = findReflectionIndex(block);
+        var horizIndex = findReflectionIndex(block, null);
+        var horizSmudgedIndex = findSmudgedReflectionIndex(block, horizIndex);
 
         // vertical reflection
         var transposedBlocks = new ArrayList<String>();
@@ -54,11 +77,14 @@ class Day13 {
                 transposedBlocks.set(i, s);
             }
         }
-        var vertIndex = findReflectionIndex(transposedBlocks);
-        assert vertIndex == 0 || horizIndex == 0;
-        assert vertIndex != 0 || horizIndex != 0;
+        var vertIndex = findReflectionIndex(transposedBlocks, null);
+        var vertSmudgedIndex = findSmudgedReflectionIndex(transposedBlocks, vertIndex);
+        assert vertIndex == 0 ^ horizIndex == 0;
+        assert vertSmudgedIndex == 0 ^ horizSmudgedIndex == 0;
+
         
-        return 100 * horizIndex + vertIndex;
+        //return 100 * horizIndex + vertIndex;
+        return 100 * horizSmudgedIndex + vertSmudgedIndex;
     }
 
     public static void main(String[] args) {
