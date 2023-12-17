@@ -106,7 +106,7 @@ def puzzle(min_direction, max_direction):
     loss_grid, nx, ny = get_loss_grid()
 
     # This variable is only for logging purposes
-    solution = nx * ny
+    solution = 9*nx * ny
 
     # The dictionary will give the least loss that the crucible should incur going from top-left to each tile of the grid.
     # For performance issues, it is first indexed by simple coordinates (x, y), then by direction and previous steps.
