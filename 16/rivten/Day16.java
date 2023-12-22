@@ -194,6 +194,31 @@ class Day16 {
         return next;
     }
 
+    private static int energize(Map<P, Character> map, int maxX, int maxY, Beam startBeam) {
+        var been = new HashSet<Beam>();
+        List<Beam> beams = new ArrayList<Beam>();
+        beams.add(startBeam);
+        been.add(startBeam);
+        while (beams.size() != 0) {
+            beams = simBeams(map, maxX, maxY, beams);
+            for (int i = 0; i < beams.size(); ++i) {
+                var beam = beams.get(i);
+                if (been.contains(beam)) {
+                    beams.remove(i);
+                    i--;
+                } else {
+                    been.add(beam);
+                }
+            }
+        }
+
+        var ps = new HashSet<P>();
+        for (var b: been) {
+            ps.add(b.p);
+        }
+        return ps.size();
+    }
+
     public static void main(String[] args) {
         var br = new BufferedReader(new InputStreamReader(System.in));
         var lines = br.lines().toList();
@@ -210,32 +235,25 @@ class Day16 {
             }
         }
 
-        var been = new HashSet<Beam>();
-        List<Beam> beams = new ArrayList<Beam>();
-        var startBeam = new Beam(new P(0, 0), Dir.RIGHT);
-        beams.add(startBeam);
-        been.add(startBeam);
-        while (beams.size() != 0) {
-            beams = simBeams(map, maxX, maxY, beams);
-            for (int i = 0; i < beams.size(); ++i) {
-                var beam = beams.get(i);
-                if (been.contains(beam)) {
-                    beams.remove(i);
-                    i--;
-                } else {
-                    been.add(beam);
-                }
-            }
-            //System.out.println("beams: " + beams);
-            //System.out.println("been: " + been);
-            //System.out.println("====================");
-            //trace(been, maxX, maxY);
+        int maxEnergize = 0;
+        for (int x = 0; x < maxX; ++x) {
+            int e = 0;
+            var startBeamTop = new Beam(new P(x, 0), Dir.DOWN);
+            e = energize(map, maxX, maxY, startBeamTop);
+            maxEnergize = Math.max(maxEnergize, e);
+            var startBeamBottom = new Beam(new P(x, maxY - 1), Dir.UP);
+            e = energize(map, maxX, maxY, startBeamBottom);
+            maxEnergize = Math.max(maxEnergize, e);
         }
-
-        var ps = new HashSet<P>();
-        for (var b: been) {
-            ps.add(b.p);
+        for (int y = 0; y < maxY; ++y) {
+            int e = 0;
+            var startBeamLeft = new Beam(new P(0, y), Dir.RIGHT);
+            e = energize(map, maxX, maxY, startBeamLeft);
+            maxEnergize = Math.max(maxEnergize, e);
+            var startBeamRight = new Beam(new P(maxX - 1, y), Dir.LEFT);
+            e = energize(map, maxX, maxY, startBeamRight);
+            maxEnergize = Math.max(maxEnergize, e);
         }
-        System.out.println(ps.size());
+        System.out.println(maxEnergize);
     }
 }
