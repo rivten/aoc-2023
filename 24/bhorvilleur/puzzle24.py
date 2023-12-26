@@ -59,10 +59,13 @@ def puzzle1():
 def puzzle2():
     hails = get_hails()
 
+    # We only need to consider the first three hails to determine all coordinates of the shot
     (x_1, y_1, z_1), (vx_1, vy_1, vz_1) = hails[0]
     (x_2, y_2, z_2), (vx_2, vy_2, vz_2) = hails[1]
     (x_3, y_3, z_3), (vx_3, vy_3, vz_3) = hails[2]
 
+    # vx, vy, vz are the speed coordinates of the projectile
+    # t1, t2 and t3 are the times at which each of the hail is shot
     vx, vy, vz, t1, t2, t3 = sympy.symbols("vx vy vz t1 t2 t3", real=True)
     equations = [sympy.Eq(vx * (t3 - t1) - (x_3 - x_1) - (vx_3 * t3 - vx_1 * t1), 0),
                  sympy.Eq(vy * (t3 - t1) - (y_3 - y_1) - (vy_3 * t3 - vy_1 * t1), 0),
@@ -75,6 +78,7 @@ def puzzle2():
 
     (vx, vy, vz, t1) = res[0][vx], res[0][vy], res[0][vz], res[0][t1]
 
+    # Once we have the coordinates of the speed and the times of shot we can compute the position of the shooting at t=0
     x = x_1 + vx_1*t1 - vx*t1
     y = y_1 + vy_1*t1 - vy*t1
     z = z_1 + vz_1*t1 - vz*t1
